@@ -10,7 +10,7 @@
 ___
 
 ## Java EE 介绍
-> Java EE 中的内容仅是标准，具体实现交给Web服务器或者Web容器
+    Java EE 中的内容仅是标准，具体实现交给Web服务器或者Web容器
 
 ### Java EE Brief History
 * Jul 1997, Servlets 1.0
@@ -60,8 +60,7 @@ ___
 * WAR归档文件,　简单的ZIP格式归档文件
 * 目录结构
     * /Root/
-    * /Root/META-INF/MANIFEST.MF
-    * /Root/META-INF/Container Resources
+    * /Root/META-INF/MANIFEST.MF & Container Resources
     * /Root/WEB-INF/web.xml & web-fragment.xml
     * /Root/WEB-INF/classes/META-INF/App Resources
     * /Root/WEB-INF/classes/*.classes
@@ -75,8 +74,7 @@ ___
     * 在Java EE中, 子女优先加载, 子女无法加载时请求父类加载器
 * EAR 企业级应用程序归档文件
     * /Root/
-    * /Root/META-INF/application.xml
-    * /Root/META-INF/MANIFEST.MF
+    * /Root/META-INF/MANIFEST.MF & application.xml
     * /Root/Module1.war & Module2.war...
     * /Root/*.jar
 ***
@@ -84,12 +82,16 @@ ___
 ## Web 容器
 ### 选择Web容器
 * Apache Tomcat (最流行)
-> Sun公司的Java Web Server于1999年捐赠给Apache变为Apache Tomcat，特点是占用内存小，配置简单和社区参与，但缺少许多Java EE组件. Apache开发了TomEE, 提供了对Java EE的完整支持, 同是Tomcat社区支持. 
-> Apache还提供另一个完整Java EE应用服务器 Geronimo，和TomEE都是Oracle认证的Java EE 应用服务器，而Tomcat没有认证，仅是Web容器.
+
+    Sun公司的Java Web Server于1999年捐赠给Apache变为Apache Tomcat，特点是占用内存小，配置简单和社区参与，但缺少许多Java EE组件. Apache开发了TomEE, 提供了对Java EE的完整支持, 同是Tomcat社区支持. Apache还提供另一个完整Java EE应用服务器 Geronimo，和TomEE都是Oracle认证的Java EE 应用服务器，而Tomcat没有认证，仅是Web容器.
+
 * GlassFish
-> 开源的社区版本和Oracle支持的商业版本. 由Tomcat核心创建, 优势是提供图形/命令/配置文件进行配置.
+
+    开源的社区版本和Oracle支持的商业版本. 由Tomcat核心创建, 优势是提供图形/命令/配置文件进行配置.
+
 * JBoss & WildFly
-> 开源的社区版本和Red Hat支持的商业版本. 第二流行的Web应用服务器, 提供EJB/Java EE支持，通过Java EE认证. 2014年更名为WildFly，提供完整管理工具，同Tomcat和GlassFish一样提供集群和高可用性.
+
+    开源的社区版本和Red Hat支持的商业版本. 第二流行的Web应用服务器, 提供EJB/Java EE支持，通过Java EE认证. 2014年更名为WildFly，提供完整管理工具，同Tomcat和GlassFish一样提供集群和高可用性.
 
 * 其他容器和应用服务器
     * Jetty, Web容器
@@ -97,8 +99,107 @@ ___
     * Oracle WebLogic, 完整的商业应用服务器
     * IBM WebSphere, 完整的商业应用服务器
 ### 安装Tomcat
-* 下载, <https://tomcat.apache.org>
-* 
+- 建议下载zip包，而非安装文件, 解压. <https://tomcat.apache.org>
+- 打开conf/tomcat-users.xml, 添加管理用户到&lt;tomcat-users&gt;标签下
+```xml
+    <tomcat-users>
+        <user username="admin" password="admin" roles="manager-gui,admin-gui" />
+    </tomcat-users>
+```
+- 执行bin/startup.sh, 启动tomcat. 默认启动在8080端口
+- 执行bin/shutdown.sh, 终止tomcat
+
+### 在Tomcat安装部署应用程序
+- 将*.war解压到webapps目录
+- 使用Web界面部署. http://localhost:8080/manager/html
+- 在conf/server.xml中&lt;Host&gt;下添加&lt;Context&gt; (_不推荐_)
+```xml
+    <Context path="/app" docBase="/home/app" debug="0" reloadable="true" />
+```
+
+### 在IntelliJ种设置Tomcat (_Eclipse略_)
+File | Settings | "Application Servers", 单击"+"指定Tomcat目录即可
+
+___
+
+## 创建Servlet
+添加maven依赖
+```xml
+    <dependency>
+        <groupId>javax.servlet</groupId>
+        <artifactId>javax.servlet-api</artifactId>
+        <version>4.0.0</version>
+        <scope>[compile,test,provided,runtime,system]</scope>
+    </dependency>
+```
+### 创建Servlet类
+    Servlet是Web应用的核心，处理和相应用户请求，也可以委托给其他类，除非过滤器拦截了该请求，否则所有请求都将发送到某个Servlet.
+
+* 继承javax.servlet.http.HttpServlet
+* 重写init, destroy, doGet方法　(override)
+    * Servlet的生命周期
+    * init在第一次访问此Servlet时加载(web.xml可配置启动时加载), 初始化DB连接
+    * services方法
+    * destroy在tomcat被关闭时调用
+* 在web.xml部署该servlet并配置
+```xml
+    <display-name>My APP</display-name>
+    <servlet>
+        <servlet-name>MyServlet</servlet-name>
+        <servlet-class>com.test.MyServlet</servlet-class>
+        <!-- <load-on-startup>1</load-on-startup> -->
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>MyServlet</servlet-name>
+        <url-pattern>/test</url-pattern>
+        <url-pattern>/hello</url-pattern>
+    </servlet-mapping>
+```
+> Annotation
+```java
+    @WebServlet(
+        name = "MyServlet",
+        urlPatterns = { "/test", "/hello" },
+        loadOnStartup = 1
+    )
+    public class MyServlet extends HttpServlet {}
+```
+* this.getServletName()获取web.xml种的<servlet-name>的内容
+* HttpServletRequest请求
+    * DELETE/TRACE/OPTIONS中URL参数会被忽略 (大多数服务器)
+    * application/x-www-form-urlencoded或multipart/formdata
+    * req.getParameter/req.getParameterValues. (在POST请求中, 请求的InputTream只能被调用一次)
+    * req.getRequestURL(), req.getHeader() 和 req.getHeader() etc.
+    * Session和Cookie, req.getSession() & req.getCookies()
+* HttpServletResponse响应
+    * resp.getOutpuStream(), resp.getWriter() 编码
+    * resp.setHeader(), resp.setStatus() HTTP响应码, resp.sendRedirect() 重定向
+* ServletContext, Context初始化参数(只能通过部署描述符web.xml完成). 初始化DB信息/邮件等
+* ServletConfig, Servlet初始化参数
+```xml
+    <context-param>
+        <param-name>a</param-name>
+        <param-value>1</param-value>
+    </context-param>
+    <servlet>
+        <init-param>
+            <param-name>b</param-name>
+            <param-value>2</param-value>
+        </init-param>
+    </servlet>
+```
+> Annotation
+```java
+    @WebServlet (
+        initParams = {
+            @WebInitParam(name = "b", value = "2",
+            @WebInitParam(name = "c", value = "3"
+        }
+    )
+```
+* 注解的缺点, 不能指定Filter的加载顺序, 故@WebFilter基本没用.
+* web.xml用来配置公共部分, 如错误处理页面/欢迎页面/Filter等等
+
 ```
 
 
