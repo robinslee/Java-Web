@@ -24,28 +24,28 @@ ___
 
 ### Java SE 7
 * try-catch-finally => try-catch-resources
-```
-        try (conn = getConnection()) {
-            // "conn" will be auto closed after try-catch
-        } catch(SQLException  e) { }
+```java
+    try (conn = getConnection()) {
+        // "conn" will be auto closed after try-catch
+    } catch(SQLException  e) { }
 ```        
 * "<>" 菱形操作符
-```
-        Map<String, Map<string, Integer>> map = new HashMap<>();
+```java
+    Map<String, Map<string, Integer>> map = new HashMap<>();
 ```
 * 二进制字面量 0b1100, 在数字字面量使用下划线 2_017
 * 字符串用作switch语句参数
 
 ### Java SE 8
 * Lambda表达式
-```
-        new Thread(new Runnable() {
-            public void run() {}
-        });
-        
-        new Thread(() -> {});
-        
-        new Thread(this::doSomething);
+```java
+    new Thread(new Runnable() {
+        public void run() {}
+    });
+    
+    new Thread(() -> {});
+    
+    new Thread(this::doSomething);
 ```
 * Joda Time (java.util.Date, java.util.Calendar)
 
@@ -60,14 +60,9 @@ ___
 * WAR归档文件,　简单的ZIP格式归档文件
 * 目录结构
     * /Root/
-    * /Root/META-INF/
     * /Root/META-INF/MANIFEST.MF
     * /Root/META-INF/Container Resources
-    * /Root/WEB-INF/
-    * /Root/WEB-INF/web.xml
-    * /Root/WEB-INF/web-fragment.xml
-    * /Root/WEB-INF/classes/
-    * /Root/WEB-INF/classes/META-INF/
+    * /Root/WEB-INF/web.xml & web-fragment.xml
     * /Root/WEB-INF/classes/META-INF/App Resources
     * /Root/WEB-INF/classes/*.classes
     * /Root/WEB-INF/i18n/国际化和本地化文件
@@ -80,18 +75,16 @@ ___
     * 在Java EE中, 子女优先加载, 子女无法加载时请求父类加载器
 * EAR 企业级应用程序归档文件
     * /Root/
-    * /Root/META-INF/
     * /Root/META-INF/application.xml
     * /Root/META-INF/MANIFEST.MF
-    * /Root/Module1.war
-    * /Root/Module2.war
+    * /Root/Module1.war & Module2.war...
     * /Root/*.jar
 ***
 
 ## Web 容器
 ### 选择Web容器
 * Apache Tomcat (最流行)
-> Sun Java Web Server捐赠给Apache变成Apache Tomcat，占用内存小，配置简单和社区参与，但缺少许多Java EE组件. Apache TomEE提供了对Java EE的完整支持, 同是Tomcat社区支持. 
+> Sun公司的Java Web Server于1999年捐赠给Apache变为Apache Tomcat，特点是占用内存小，配置简单和社区参与，但缺少许多Java EE组件. Apache开发了TomEE, 提供了对Java EE的完整支持, 同是Tomcat社区支持. 
 > Apache还提供另一个完整Java EE应用服务器 Geronimo，和TomEE都是Oracle认证的Java EE 应用服务器，而Tomcat没有认证，仅是Web容器.
 * GlassFish
 > 开源的社区版本和Oracle支持的商业版本. 由Tomcat核心创建, 优势是提供图形/命令/配置文件进行配置.
